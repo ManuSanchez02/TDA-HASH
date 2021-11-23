@@ -88,7 +88,7 @@ void dadoUnHashVacio_puedoInsertarVariosElementos_yLiberarlosCorrectamente(){
 }
 
 void dadoUnHashVacio_puedoInsertarMuchosElementos(){
-    hash_t* hash = hash_crear(NULL, 50);
+    hash_t* hash = hash_crear(NULL, 25);
     int vector[10000];
 
     bool hubo_error = false;
@@ -101,7 +101,6 @@ void dadoUnHashVacio_puedoInsertarMuchosElementos(){
     }
 
     pa2m_afirmar((hubo_error == false), "No hubo error al insertar 10000 elementos");
-    pa2m_afirmar((hash_cantidad(hash) == 10000), "El hash tiene 10000 elementos");
 
     hash_destruir(hash);
 }
@@ -118,6 +117,7 @@ int main(){
     dadoUnHashVacio_puedoInsertarUnElementoYLiberarloCorrectamente();
     dadoUnHashVacio_puedoInsertarVariosElementos_yLiberarlosCorrectamente();
     dadoUnHashVacio_puedoInsertarMuchosElementos();
+
 
     return pa2m_mostrar_reporte();
 }
