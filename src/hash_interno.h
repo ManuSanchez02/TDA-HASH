@@ -4,9 +4,11 @@
 #include "hash.h"
 
 const int CAPACIDAD_MINIMA;
-const int TAMANIO_MAXIMO_ARBOL;
 const int ERROR;
 const int EXITO;
+const int MULTIPLICADOR_LIMITE_REHASHEO;
+const int MULTIPLICADOR_NUEVO_TAMANIO;
+
 
 
 struct hash{
@@ -28,5 +30,8 @@ casillero_t* inicializar_casillero(const char* clave, void* elemento);
 
 bool destructor_de_datos_aux(void* elemento, void* _hash);
 
+bool rehashear(hash_t* hash);
+
+int obtener_posicion_casillero(hash_t* hash, const char* clave);
 
 #endif /* __HASH_INTERNO_H__ */
