@@ -14,8 +14,9 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad_inic
     if(!hash)
         return NULL;
 
-    hash->capacidad_maxima = capacidad_inicial;
-    hash->cantidad_actual = 0;
+    hash->cantidad_maxima_tabla = capacidad_inicial;
+    hash->cantidad_actual_casilleros = 0;
+    hash->cantidad_actual_tabla = 0;
     hash->destructor = destruir_elemento;
     hash->tabla_hash = calloc(capacidad_inicial, sizeof(lista_t*));
 
@@ -32,7 +33,7 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     if(!hash || !clave)
         return ERROR;
     
-    size_t clave_hasheada = hashear(clave) % hash->capacidad_maxima;
+    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_tabla;
     casillero_t* casillero = inicializar_casillero(clave, elemento);
     if(!casillero)
         return ERROR;
@@ -42,13 +43,14 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
         if(!lista)
             return ERROR;
         
-        hash->cantidad_actual++;
         hash->tabla_hash[clave_hasheada] = lista;
+        hash->cantidad_actual_tabla++;
     }
 
     if(!lista_insertar(hash->tabla_hash[clave_hasheada], casillero))
         return ERROR;
 
+    hash->cantidad_actual_casilleros++;
     return EXITO; // TODO: Rehashear despues de cierta cantidad
 }
 
@@ -72,7 +74,7 @@ size_t hash_cantidad(hash_t* hash){
     if(!hash)
         return 0;
         
-    return hash->cantidad_actual;
+    return hash->cantidad_actual_casilleros;
 }
 
 
@@ -80,7 +82,7 @@ void hash_destruir(hash_t* hash){
     if(!hash)
         return;
 
-    for(size_t i = 0; i < hash->capacidad_maxima; i++){
+    for(size_t i = 0; i < hash->cantidad_maxima_tabla; i++){
         lista_con_cada_elemento(hash->tabla_hash[i], destructor_de_datos_aux, hash);
         lista_destruir(hash->tabla_hash[i]);
     }

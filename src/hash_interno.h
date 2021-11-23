@@ -10,8 +10,9 @@ const int EXITO;
 
 
 struct hash{
-    size_t capacidad_maxima;
-    size_t cantidad_actual;
+    size_t cantidad_maxima_tabla;
+    size_t cantidad_actual_tabla; // TODO: REVISAR SI ES UTIL
+    size_t cantidad_actual_casilleros;
     hash_destruir_dato_t destructor;
     lista_t** tabla_hash;
 };
