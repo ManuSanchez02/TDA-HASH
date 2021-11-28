@@ -66,7 +66,7 @@ int obtener_posicion_casillero(hash_t* hash, const char* clave){
     if(!clave)
         return -1;
 
-    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_tabla;
+    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_listas;
 
     lista_iterador_t* iterador = lista_iterador_crear(hash->tabla_hash[clave_hasheada]);
     if(!iterador)
@@ -94,7 +94,7 @@ void liberar_tabla_hash(hash_t* hash){
     if(!hash)
         return;
     
-    for(size_t i = 0; i < hash->cantidad_maxima_tabla; i++){
+    for(size_t i = 0; i < hash->cantidad_maxima_listas; i++){
         lista_con_cada_elemento(hash->tabla_hash[i], destructor_de_datos_aux, hash);
         lista_destruir(hash->tabla_hash[i]);
     }
@@ -118,9 +118,9 @@ bool copiar_casillero(hash_t* origen, const char* clave, void* _destino){
     void* elemento_en_posicion = hash_obtener(origen, clave);
 
     if(hash_insertar(destino, clave, elemento_en_posicion) == EXITO)
-        return false;
+        return false; // !EXPLICAR
     else
-        return true;
+        return true; // !EXPLICAR
 }
 
 
@@ -128,19 +128,19 @@ bool rehashear(hash_t* hash, size_t multplicador_tamanio){
     if(!hash || !hash->tabla_hash || multplicador_tamanio == 0)
         return false;
 
-    hash_t* hash_nuevo = hash_crear(hash->destructor, hash->cantidad_maxima_tabla*MULTIPLICADOR_NUEVO_TAMANIO);
+    hash_t* hash_nuevo = hash_crear(hash->destructor, hash->cantidad_maxima_listas*MULTIPLICADOR_NUEVO_TAMANIO);
     if(!hash_nuevo)
         return false;
 
 
     if(hash_con_cada_clave(hash, copiar_casillero, hash_nuevo) == hash_cantidad(hash)){
-        hash->destructor = NULL;
+        hash->destructor = NULL; // !EXPLICAR
         liberar_tabla_hash(hash);
         *hash = *hash_nuevo;
         free(hash_nuevo);
         return true;
     }else{
-        hash_nuevo->destructor = NULL;
+        hash_nuevo->destructor = NULL; // !EXPLICAR
         hash_destruir(hash_nuevo);
         return false;
     }

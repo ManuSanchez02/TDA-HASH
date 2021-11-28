@@ -60,7 +60,7 @@ void prueboCrearUnHashConCapacidadMayorALaMinima_ySeCreaConLaCapacidadIndicada()
     hash_t* hash = hash_crear(NULL, 5);
 
     pa2m_afirmar(hash != NULL, "Puedo crear un hash con capacidad mayor a la minima");
-    pa2m_afirmar(hash->cantidad_maxima_tabla == 5, "El hash se crea con la capacidad correcta");
+    pa2m_afirmar(hash->cantidad_maxima_listas == 5, "El hash se crea con la capacidad correcta");
 
     hash_destruir(hash);
 }
@@ -69,7 +69,7 @@ void prueboCrearUnHashConCapacidadMenorALaMinima_ySeCreaConLaCapacidadMinima(){
     hash_t* hash = hash_crear(NULL, 2);
 
     pa2m_afirmar(hash != NULL, "Puedo crear un hash con capacidad menor a la minima");
-    pa2m_afirmar(hash->cantidad_maxima_tabla == 3, "El hash se crea con la capacidad correcta");
+    pa2m_afirmar(hash->cantidad_maxima_listas == 3, "El hash se crea con la capacidad correcta");
 
     hash_destruir(hash);
 }
