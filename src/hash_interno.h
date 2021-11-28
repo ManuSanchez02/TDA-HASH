@@ -30,7 +30,9 @@ casillero_t* inicializar_casillero(const char* clave, void* elemento);
 
 bool destructor_de_datos_aux(void* elemento, void* _hash);
 
-bool rehashear(hash_t* hash);
+void liberar_tabla_hash(hash_t* hash);
+
+bool rehashear(hash_t* hash, size_t multplicador_tamanio);
 
 int obtener_posicion_casillero(hash_t* hash, const char* clave);
 

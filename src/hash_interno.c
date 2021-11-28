@@ -1,16 +1,20 @@
 #include "hash_interno.h"
 #include "hash.h"
-
+#include <stdio.h>
 
 size_t hashear(const char* clave){
     if(!clave)
         return 0;
     
-    size_t clave_hasheada = (size_t)clave[0];
-    int i = 1;
+    size_t clave_hasheada = 0;
+    size_t i = 0;
 
     while(clave[i] != '\0'){
-        clave_hasheada *= clave[i];
+        if(clave_hasheada == 0){
+            clave_hasheada += clave[i];
+        }else{
+            clave_hasheada *= clave[i];
+        }
         i++;
     }
 
@@ -51,39 +55,6 @@ bool destructor_de_datos_aux(void* _casillero, void* _hash){
     return true;    
 }
 
-bool copiar_casilleros_hash(hash_t* destino, hash_t* origen){
-    /*for(size_t i = 0; i < origen->cantidad_actual_casilleros){
-        char* clave;
-        hash_con_cada_clave
-    }*/
-
-    return false;
-}
-
-bool rehashear(hash_t* hash){
-    if(!hash)
-        return false;
-
-    hash_t* hash_nuevo = malloc(sizeof(hash_t));
-    if(!hash_nuevo)
-        return false;
-
-    size_t nuevo_tamanio_maximo = MULTIPLICADOR_NUEVO_TAMANIO*hash->cantidad_maxima_tabla;
-
-    hash_nuevo->cantidad_actual_tabla = 0;
-    hash_nuevo->destructor = hash->destructor;
-    hash_nuevo->cantidad_actual_casilleros = hash->cantidad_actual_casilleros;
-    hash_nuevo->cantidad_maxima_tabla = nuevo_tamanio_maximo;
-    hash_nuevo->tabla_hash = calloc(nuevo_tamanio_maximo, sizeof(lista_t*));
-    if(!hash_nuevo->tabla_hash){
-        free(hash_nuevo);
-        return false;
-    }
-
-    return copiar_casilleros_hash(hash_nuevo, hash);
-}
-
-
 int obtener_posicion_casillero(hash_t* hash, const char* clave){
     if(!clave)
         return -1;
@@ -109,4 +80,54 @@ int obtener_posicion_casillero(hash_t* hash, const char* clave){
     free(iterador);
 
     return posicion;
+}
+
+void liberar_tabla_hash(hash_t* hash){
+    if(!hash)
+        return;
+
+    
+    for(size_t i = 0; i < hash->cantidad_maxima_tabla; i++){
+        lista_con_cada_elemento(hash->tabla_hash[i], destructor_de_datos_aux, hash);
+        lista_destruir(hash->tabla_hash[i]);
+    }
+
+    free(hash->tabla_hash);
+}
+
+bool copiar_casillero(hash_t* origen, const char* clave, void* _destino){
+    if(!origen || !clave || !_destino)
+        return true;
+
+    hash_t* destino = _destino;
+
+    void* elemento_en_posicion = hash_obtener(origen, clave);
+
+    if(hash_insertar(destino, clave, elemento_en_posicion) == EXITO)
+        return false;
+    else
+        return true;
+}
+
+bool rehashear(hash_t* hash, size_t multplicador_tamanio){
+    if(!hash || !hash->tabla_hash || multplicador_tamanio == 0)
+        return false;
+
+    hash_t* hash_nuevo = hash_crear(hash->destructor, hash->cantidad_maxima_tabla*MULTIPLICADOR_NUEVO_TAMANIO);
+    if(!hash_nuevo)
+        return false;
+
+
+    if(hash_con_cada_clave(hash, copiar_casillero, hash_nuevo) == hash_cantidad(hash)){
+        hash->destructor = NULL;
+        liberar_tabla_hash(hash);
+        *hash = *hash_nuevo;
+        free(hash_nuevo);
+        return true;
+    }else{
+        hash_nuevo->destructor = NULL;
+        hash_destruir(hash_nuevo);
+        return false;
+    }
+    
 }

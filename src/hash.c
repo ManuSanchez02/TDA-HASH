@@ -4,8 +4,15 @@
 const int CAPACIDAD_MINIMA = 3;
 const int ERROR = -1;
 const int EXITO = 0;
-const int MULTIPLICADOR_LIMITE_REHASHEO = 5;
-const int MULTIPLICADOR_NUEVO_TAMANIO = 3;
+const int MULTIPLICADOR_LIMITE_REHASHEO = 3;
+const int MULTIPLICADOR_NUEVO_TAMANIO = 5;
+
+typedef struct informacion_funcion {
+    bool (*funcion)(hash_t* hash, const char* clave, void* aux);
+    hash_t* hash;
+    void* aux;
+    bool retorno;
+} informacion_funcion_t;
 
 
 hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad_inicial){
@@ -35,10 +42,10 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     if(!hash || !clave)
         return ERROR;
 
-    /*if(hash->cantidad_actual_casilleros > hash->cantidad_maxima_tabla*MULTIPLICADOR_LIMITE_REHASHEO){
-        if(!rehashear(hash))
+    if(hash_cantidad(hash) > hash->cantidad_maxima_tabla*MULTIPLICADOR_LIMITE_REHASHEO){
+        if(!rehashear(hash, MULTIPLICADOR_NUEVO_TAMANIO))
             return ERROR;
-    }*/ // TODO: Rehashear despues de cierta cantidad
+    }
 
     size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_tabla;
 
@@ -90,6 +97,7 @@ int hash_quitar(hash_t* hash, const char* clave){
         free(casillero->clave);
         if(hash->destructor)
             hash->destructor(casillero->valor);
+        
         free(casillero);
         hash->cantidad_actual_casilleros--;
         
@@ -137,16 +145,43 @@ void hash_destruir(hash_t* hash){
     if(!hash)
         return;
 
-    for(size_t i = 0; i < hash->cantidad_maxima_tabla; i++){
-        lista_con_cada_elemento(hash->tabla_hash[i], destructor_de_datos_aux, hash);
-        lista_destruir(hash->tabla_hash[i]);
-    }
+    liberar_tabla_hash(hash);
 
-    free(hash->tabla_hash);
     free(hash);
 }
 
 
+bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){
+    if(!_casillero || !_datos_funcion)
+        return true;
+
+    casillero_t* casillero = _casillero;
+    informacion_funcion_t* datos_funcion = _datos_funcion;
+
+
+    return !(datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux));
+}
+
 size_t hash_con_cada_clave(hash_t* hash, bool (*funcion)(hash_t* hash, const char* clave, void* aux), void* aux){
-    return 0;
+    if(!hash || ! funcion)
+        return 0;
+
+    informacion_funcion_t datos_funcion;
+
+
+    datos_funcion.funcion = funcion;
+    datos_funcion.hash = hash;
+    datos_funcion.aux = aux;
+    datos_funcion.retorno = false;
+
+    size_t contador_iteraciones = 0;
+    int i = 0;
+    while(i < hash->cantidad_maxima_tabla && datos_funcion.retorno == false){
+        contador_iteraciones += lista_con_cada_elemento(hash->tabla_hash[i], hash_con_cada_clave_aux, &datos_funcion);
+        i++;
+    }
+
+
+
+    return contador_iteraciones;
 }
