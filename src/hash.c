@@ -12,7 +12,7 @@ typedef struct informacion_funcion {
     hash_t* hash;
     void* aux;
     bool retorno;
-} informacion_funcion_t;
+} datos_funcion_t;
 
 
 hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad_inicial){
@@ -150,23 +150,30 @@ void hash_destruir(hash_t* hash){
     free(hash);
 }
 
-
+/*
+ * Pre: _casillero y _datos_funcion deben ser distintos de NULL
+        - _casillero debe ser un puntero a casillero_t
+        - _datos_funcion debe ser un puntero a datos_funcion_t
+ * Post: devuelve true si datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux) == false, y false
+         en caso contrario
+*/
 bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){
     if(!_casillero || !_datos_funcion)
         return true;
 
     casillero_t* casillero = _casillero;
-    informacion_funcion_t* datos_funcion = _datos_funcion;
+    datos_funcion_t* datos_funcion = _datos_funcion;
 
 
     return !(datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux));
 }
 
+
 size_t hash_con_cada_clave(hash_t* hash, bool (*funcion)(hash_t* hash, const char* clave, void* aux), void* aux){
     if(!hash || ! funcion)
         return 0;
 
-    informacion_funcion_t datos_funcion;
+    datos_funcion_t datos_funcion;
 
 
     datos_funcion.funcion = funcion;

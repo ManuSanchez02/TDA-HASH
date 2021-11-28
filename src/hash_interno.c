@@ -2,6 +2,7 @@
 #include "hash.h"
 #include <stdio.h>
 
+
 size_t hashear(const char* clave){
     if(!clave)
         return 0;
@@ -10,16 +11,13 @@ size_t hashear(const char* clave){
     size_t i = 0;
 
     while(clave[i] != '\0'){
-        if(clave_hasheada == 0){
-            clave_hasheada += clave[i];
-        }else{
-            clave_hasheada *= clave[i];
-        }
+        clave_hasheada += clave[i];
         i++;
     }
 
     return clave_hasheada;
 }
+
 
 casillero_t* inicializar_casillero(const char* clave, void* elemento){
     if(!clave)
@@ -39,12 +37,20 @@ casillero_t* inicializar_casillero(const char* clave, void* elemento){
     return casillero;
 }
 
+
+/*
+ * Pre: - _casillero y _hash deben ser distintos de NULL
+        - _casillero debe ser un puntero a un casillero
+        - _hash debe ser un puntero a un hash
+ * Post: Libera la memoria de la clave, el casillero, y si el hash tiene una
+ *       funcion de destruccion, tambien libera el elemento
+*/
 bool destructor_de_datos_aux(void* _casillero, void* _hash){
+    if(!_hash || !_casillero)
+        return false;
+
     hash_t* hash = _hash;
     casillero_t* casillero = _casillero;
-
-    if(!hash || !casillero)
-        return false;
 
     if(hash->destructor)
         hash->destructor(casillero->valor);
@@ -54,6 +60,7 @@ bool destructor_de_datos_aux(void* _casillero, void* _hash){
 
     return true;    
 }
+
 
 int obtener_posicion_casillero(hash_t* hash, const char* clave){
     if(!clave)
@@ -82,10 +89,10 @@ int obtener_posicion_casillero(hash_t* hash, const char* clave){
     return posicion;
 }
 
+
 void liberar_tabla_hash(hash_t* hash){
     if(!hash)
         return;
-
     
     for(size_t i = 0; i < hash->cantidad_maxima_tabla; i++){
         lista_con_cada_elemento(hash->tabla_hash[i], destructor_de_datos_aux, hash);
@@ -95,6 +102,13 @@ void liberar_tabla_hash(hash_t* hash){
     free(hash->tabla_hash);
 }
 
+
+/*
+ * Pre: - origen, clave y destino deben ser distintos de NULL
+        - destino debe ser un puntero hash
+ * Post: - Inserta en _destino, el casillero de origen correspondiente a clave
+         - Devuelve false si pudo insertae el elemento y true en caso contrario
+*/
 bool copiar_casillero(hash_t* origen, const char* clave, void* _destino){
     if(!origen || !clave || !_destino)
         return true;
@@ -108,6 +122,7 @@ bool copiar_casillero(hash_t* origen, const char* clave, void* _destino){
     else
         return true;
 }
+
 
 bool rehashear(hash_t* hash, size_t multplicador_tamanio){
     if(!hash || !hash->tabla_hash || multplicador_tamanio == 0)
@@ -129,5 +144,4 @@ bool rehashear(hash_t* hash, size_t multplicador_tamanio){
         hash_destruir(hash_nuevo);
         return false;
     }
-    
 }
