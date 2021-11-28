@@ -2,10 +2,18 @@
 #include "src/hash.h"
 #include "src/hash_interno.h"
 
+/*
+ * Pre: elemento debe ser un puntero a int
+ * Post: Libera la memoria de elemento
+*/
 void destructor_de_enteros(void* elemento){
     free(elemento);
 }
 
+/*
+ * Pre:
+ * Post: si hash o clave son NULL, devuelve true. Devuelve false en caso contrario
+*/
 bool recorrer_todo(hash_t* hash, const char* clave, void* aux){
     if(!hash || !clave)
         return true;
@@ -15,16 +23,6 @@ bool recorrer_todo(hash_t* hash, const char* clave, void* aux){
     aux = aux;
 
     return false;
-}
-
-bool recorrer_hasta_limite(hash_t* hash, const char* clave, void* limite){
-    if(!hash || !clave)
-        return true;
-    
-    if(*(int*) hash_obtener(hash, clave) < *(int*) limite)
-        return false;
-
-    return true;
 }
 
 void dadoUnHashNULL_intentoRealizarOperaciones(){
