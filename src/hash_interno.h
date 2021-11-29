@@ -2,6 +2,10 @@
 #define __HASH_INTERNO_H__
 
 #include "hash.h"
+#include "lista.h"
+#include <stdlib.h>
+#include <string.h>
+
 
 const int CAPACIDAD_MINIMA;
 const int ERROR;

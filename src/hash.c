@@ -1,5 +1,7 @@
 #include "hash.h"
 #include "hash_interno.h"
+#include <stdlib.h>
+#include <string.h>
 
 const int CAPACIDAD_MINIMA = 3;
 const int ERROR = -1;
@@ -12,6 +14,7 @@ typedef struct informacion_funcion {
     hash_t* hash;
     void* aux;
     bool retorno;
+    size_t contador_iteraciones;
 } datos_funcion_t;
 
 
@@ -156,38 +159,37 @@ void hash_destruir(hash_t* hash){
  * Post: devuelve true si datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux) == false, y false
          en caso contrario
 */
-bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){
+bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){  // !EXPLICAR
     if(!_casillero || !_datos_funcion)
         return true;
 
     casillero_t* casillero = _casillero;
     datos_funcion_t* datos_funcion = _datos_funcion;
+    datos_funcion->contador_iteraciones++;
+    datos_funcion->retorno = datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux);
 
-
-    return !(datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux));
+    return !(datos_funcion->retorno); // !EXPLICAR
 }
 
 
 size_t hash_con_cada_clave(hash_t* hash, bool (*funcion)(hash_t* hash, const char* clave, void* aux), void* aux){
-    if(!hash || ! funcion)
+    if(!hash || !funcion)
         return 0;
 
     datos_funcion_t datos_funcion;
-
-
     datos_funcion.funcion = funcion;
     datos_funcion.hash = hash;
     datos_funcion.aux = aux;
     datos_funcion.retorno = false;
+    datos_funcion.contador_iteraciones = 0;
 
-    size_t contador_iteraciones = 0;
     int i = 0;
     while(i < hash->cantidad_maxima_listas && datos_funcion.retorno == false){
-        contador_iteraciones += lista_con_cada_elemento(hash->tabla_hash[i], hash_con_cada_clave_aux, &datos_funcion);
+        lista_con_cada_elemento(hash->tabla_hash[i], hash_con_cada_clave_aux, &datos_funcion);
         i++;
     }
 
 
 
-    return contador_iteraciones;
+    return datos_funcion.contador_iteraciones;
 }

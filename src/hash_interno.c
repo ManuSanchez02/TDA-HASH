@@ -1,6 +1,4 @@
 #include "hash_interno.h"
-#include "hash.h"
-#include <stdio.h>
 
 
 size_t hashear(const char* clave){

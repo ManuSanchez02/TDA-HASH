@@ -12,7 +12,7 @@ void destructor_de_enteros(void* elemento){
 
 /*
  * Pre:
- * Post: si hash o clave son NULL, devuelve true. Devuelve false en caso contrario
+ * Post: Si hash o clave son NULL, devuelve true. Devuelve false en caso contrario
 */
 bool recorrer_todo(hash_t* hash, const char* clave, void* aux){
     if(!hash || !clave)
@@ -23,6 +23,26 @@ bool recorrer_todo(hash_t* hash, const char* clave, void* aux){
     aux = aux;
 
     return false;
+}
+
+/*
+ * Pre:
+ * Post: Devuelve false si contador es menor a 4 y true en caso contrario. Si hash o clave son NULL, tambien devuelve true
+*/
+bool mayor_a_4(hash_t* hash, const char* clave, void* _contador){
+    if(!hash || !clave)
+        return true;
+
+    int* contador = _contador;
+    hash = hash;
+    clave = clave;
+
+    if(*contador < 4){
+        (*contador)++;
+        return false;
+    }
+
+    return true;
 }
 
 void dadoUnHashNULL_intentoRealizarOperaciones(){
@@ -138,18 +158,22 @@ void dadoUnHashVacio_puedoInsertarVariosElementos_yLiberarlosCorrectamente(){
 
 void dadoUnHashVacio_puedoInsertarMuchosElementos(){
     hash_t* hash = hash_crear(NULL, 5);
-    int vector[10000];
+    int vector[1000];
 
     bool hubo_error = false;
 
-    for(int i = 0; i < 10000; i++){
+    for(int i = 0; i < 1000; i++){
         vector[i] = i;
-        if(hash_insertar(hash, "A"+ i%26, &vector[i]) == ERROR){
+        char* clave = malloc(6*sizeof(char));
+        sprintf(clave, "%i", i);
+        if(hash_insertar(hash, clave, &vector[i]) == ERROR){
             hubo_error = true;
         }
+        free(clave);
     }
 
-    pa2m_afirmar((hubo_error == false), "No hubo error al insertar 10000 elementos");
+    pa2m_afirmar((hubo_error == false), "No hubo error al insertar 1000 elementos");
+    pa2m_afirmar((hash_cantidad(hash) == 1000), "La cantidad de elementos es 1000");
 
     hash_destruir(hash);
 }
@@ -263,7 +287,7 @@ void dadoUnHashConElementos_recorroTodosLosElementos(){
     hash_destruir(hash);
 }
 
-void dadoUnHashConElementos_recorroTodosLosElementos_mientrasSeanMenoresA50(){
+void dadoUnHashConElementos_recorro5Elementos(){
     hash_t* hash = hash_crear(NULL, 3);
     int elemento1 = 97;
     int elemento2 = 2;
@@ -272,6 +296,8 @@ void dadoUnHashConElementos_recorroTodosLosElementos_mientrasSeanMenoresA50(){
     int elemento5 = 21;
     int elemento6 = 242;
 
+    int contador = 0;
+
     hash_insertar(hash, "a", &elemento1);
     hash_insertar(hash, "b", &elemento2);
     hash_insertar(hash, "c", &elemento3);
@@ -279,10 +305,11 @@ void dadoUnHashConElementos_recorroTodosLosElementos_mientrasSeanMenoresA50(){
     hash_insertar(hash, "e", &elemento5);
     hash_insertar(hash, "f", &elemento6);
 
-    pa2m_afirmar((hash_con_cada_clave(hash, recorrer_todo, NULL) == 6), "Iterar sobre un hash con una funcion de recorrer todo devuelve todos los elementos iterados");
+    pa2m_afirmar((hash_con_cada_clave(hash, mayor_a_4, &contador) == 5), "Iterar sobre un hash devuelve que la funcion es invocada 5 veces");
 
     hash_destruir(hash);
 }
+
 
 int main(){
     pa2m_nuevo_grupo("Pruebas con hash nulo o vacio");
@@ -309,7 +336,7 @@ int main(){
     dadoUnHashVacio_elIteradorInternoDevuelve0Elementos();
     dadoUnHash_elIteradorInternoConFuncionNULLDevuelve0Elementos();
     dadoUnHashConElementos_recorroTodosLosElementos();
-    dadoUnHashConElementos_recorroTodosLosElementos_mientrasSeanMenoresA50();
+    dadoUnHashConElementos_recorro5Elementos();
 
     return pa2m_mostrar_reporte();
 }

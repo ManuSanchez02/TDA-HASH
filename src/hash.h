@@ -3,11 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include "lista.h"
-
-
 
 typedef struct hash hash_t;
 
