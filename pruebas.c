@@ -116,7 +116,7 @@ void dadoUnHashVacio_puedoInsertarUnElementoYLiberarloCorrectamente(){
     *elemento = 5;
 
     pa2m_afirmar((hash_insertar(hash, "abc", elemento) == EXITO), "Puedo insertar el elemento del heap");
-        pa2m_afirmar((hash_contiene(hash, "abc") == true), "Puedo encontrar el elemento en el hash");
+    pa2m_afirmar((hash_contiene(hash, "abc") == true), "Puedo encontrar el elemento en el hash");
     pa2m_afirmar((hash_obtener(hash, "abc") == elemento), "Puedo obtener el elemento del hash");
     pa2m_afirmar((hash_cantidad(hash) == 1), "El hash tiene el tamanio correcto");
 
