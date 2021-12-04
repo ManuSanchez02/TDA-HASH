@@ -6,8 +6,8 @@
 const int CAPACIDAD_MINIMA = 3;
 const int ERROR = -1;
 const int EXITO = 0;
-const int MULTIPLICADOR_LIMITE_REHASHEO = 3;
-const int MULTIPLICADOR_NUEVO_TAMANIO = 5;
+const int MULTIPLICADOR_LIMITE_REHASHEO = 5;
+const int MULTIPLICADOR_NUEVO_TAMANIO = 10;
 
 typedef struct informacion_funcion {
     bool (*funcion)(hash_t* hash, const char* clave, void* aux);
@@ -28,7 +28,6 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad_inic
 
     hash->cantidad_maxima_listas = capacidad_inicial;
     hash->cantidad_actual_casilleros = 0;
-    hash->cantidad_listas_usadas = 0;
     hash->destructor = destruir_elemento;
     hash->tabla_hash = calloc(capacidad_inicial, sizeof(lista_t*));
 
@@ -45,12 +44,12 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     if(!hash || !clave)
         return ERROR;
 
-    if(hash_cantidad(hash) > hash->cantidad_maxima_listas*MULTIPLICADOR_LIMITE_REHASHEO){ // !EXPLICAR
+    if(hash_cantidad(hash) > hash->cantidad_maxima_listas*MULTIPLICADOR_LIMITE_REHASHEO){
         if(!rehashear(hash, MULTIPLICADOR_NUEVO_TAMANIO))
             return ERROR;
     }
 
-    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_listas;
+    size_t clave_hasheada = funcion_hash(clave) % hash->cantidad_maxima_listas;
 
     int pos_casillero = obtener_posicion_casillero(hash, clave);
     if(pos_casillero != -1){
@@ -73,7 +72,6 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
             return ERROR;
         
         hash->tabla_hash[clave_hasheada] = lista;
-        hash->cantidad_listas_usadas++;
     }
 
 
@@ -91,7 +89,7 @@ int hash_quitar(hash_t* hash, const char* clave){
         return ERROR;
 
 
-    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_listas;
+    size_t clave_hasheada = funcion_hash(clave) % hash->cantidad_maxima_listas;
 
     int pos_casillero = obtener_posicion_casillero(hash, clave);
     if(pos_casillero != -1){
@@ -114,7 +112,7 @@ void* hash_obtener(hash_t* hash, const char* clave){
     if(!hash || !clave)
         return NULL;
 
-    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_listas;
+    size_t clave_hasheada = funcion_hash(clave) % hash->cantidad_maxima_listas;
     int pos_casillero = obtener_posicion_casillero(hash, clave);
 
     if(pos_casillero == -1)
@@ -159,7 +157,7 @@ void hash_destruir(hash_t* hash){
  * Post: devuelve true si datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux) == false, y false
          en caso contrario
 */
-bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){  // !EXPLICAR
+bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){
     if(!_casillero || !_datos_funcion)
         return true;
 
@@ -168,7 +166,7 @@ bool hash_con_cada_clave_aux(void* _casillero, void* _datos_funcion){  // !EXPLI
     datos_funcion->contador_iteraciones++;
     datos_funcion->retorno = datos_funcion->funcion(datos_funcion->hash, casillero->clave, datos_funcion->aux);
 
-    return !(datos_funcion->retorno); // !EXPLICAR
+    return !(datos_funcion->retorno);
 }
 
 

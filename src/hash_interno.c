@@ -1,7 +1,7 @@
 #include "hash_interno.h"
 
 
-size_t hashear(const char* clave){
+size_t funcion_hash(const char* clave){
     if(!clave)
         return 0;
     
@@ -64,7 +64,7 @@ int obtener_posicion_casillero(hash_t* hash, const char* clave){
     if(!clave)
         return -1;
 
-    size_t clave_hasheada = hashear(clave) % hash->cantidad_maxima_listas;
+    size_t clave_hasheada = funcion_hash(clave) % hash->cantidad_maxima_listas;
 
     lista_iterador_t* iterador = lista_iterador_crear(hash->tabla_hash[clave_hasheada]);
     if(!iterador)
@@ -116,9 +116,9 @@ bool copiar_casillero(hash_t* origen, const char* clave, void* _destino){
     void* elemento_en_posicion = hash_obtener(origen, clave);
 
     if(hash_insertar(destino, clave, elemento_en_posicion) == EXITO)
-        return false; // !EXPLICAR
+        return false;
     else
-        return true; // !EXPLICAR
+        return true;
 }
 
 
@@ -132,13 +132,13 @@ bool rehashear(hash_t* hash, size_t multplicador_tamanio){
 
 
     if(hash_con_cada_clave(hash, copiar_casillero, hash_nuevo) == hash_cantidad(hash)){
-        hash->destructor = NULL; // !EXPLICAR
+        hash->destructor = NULL;
         liberar_tabla_hash(hash);
         *hash = *hash_nuevo;
         free(hash_nuevo);
         return true;
     }else{
-        hash_nuevo->destructor = NULL; // !EXPLICAR
+        hash_nuevo->destructor = NULL;
         hash_destruir(hash_nuevo);
         return false;
     }

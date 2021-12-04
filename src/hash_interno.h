@@ -17,7 +17,6 @@ const int MULTIPLICADOR_NUEVO_TAMANIO;
 
 struct hash{
     size_t cantidad_maxima_listas;
-    size_t cantidad_listas_usadas; // TODO: REVISAR SI ES UTIL
     size_t cantidad_actual_casilleros;
     hash_destruir_dato_t destructor;
     lista_t** tabla_hash;
@@ -33,7 +32,7 @@ typedef struct casillero{
  * Pre: clave debe ser distinta de NULL
  * Post: Devuelve la posicion de la tabla_hash para la respectiva clave
 */
-size_t hashear(const char* clave);
+size_t funcion_hash(const char* clave);
 
 
 /*
