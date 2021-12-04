@@ -196,6 +196,44 @@ void dadoUnHashConUnElemento_puedoSobreescribirlo(){
     hash_destruir(hash);
 }
 
+void dadoUnHashConVariosElemento_puedoSobreescribirAlgunos(){
+    hash_t* hash = hash_crear(NULL, 3);
+    int elemento1 = 5;
+    int elemento2 = -65;
+    int elemento3 = 45;
+    int elemento4 = 2;
+    int elemento5 = 99;
+    int elemento6 = 99999;
+    int elemento7 = 4;
+    int elemento8 = 10;
+
+    hash_insertar(hash, "abc", &elemento1);
+    hash_insertar(hash, "dsa", &elemento2);
+    hash_insertar(hash, "hrtyr", &elemento3);
+    hash_insertar(hash, "vds", &elemento4);
+    hash_insertar(hash, "xzcxzcxz", &elemento5);
+
+    pa2m_afirmar((hash_insertar(hash, "hrtyr", &elemento6) == EXITO), "Puedo sobreescribir el elemento 3");
+    pa2m_afirmar((hash_contiene(hash, "hrtyr") == true), "El elemento esta en el hash");
+    pa2m_afirmar((hash_obtener(hash, "hrtyr") == &elemento6), "El elemento con la clave asignada es el nuevo");
+    pa2m_afirmar((hash_cantidad(hash) == 5), "El hash tiene 5 elementos");
+
+    pa2m_afirmar((hash_insertar(hash, "dsa", &elemento7) == EXITO), "Puedo sobreescribir el elemento 2");
+    pa2m_afirmar((hash_contiene(hash, "dsa") == true), "El elemento esta en el hash");
+    pa2m_afirmar((hash_obtener(hash, "dsa") == &elemento7), "El elemento con la clave asignada es el nuevo");
+    pa2m_afirmar((hash_cantidad(hash) == 5), "El hash tiene 5 elementos");
+
+    pa2m_afirmar((hash_insertar(hash, "hrtyr", &elemento8) == EXITO), "Puedo sobreescribir el elemento 3 nuevamente");
+    pa2m_afirmar((hash_contiene(hash, "hrtyr") == true), "El elemento esta en el hash");
+    pa2m_afirmar((hash_obtener(hash, "hrtyr") == &elemento8), "El elemento con la clave asignada es el nuevo");
+    pa2m_afirmar((hash_cantidad(hash) == 5), "El hash tiene 5 elementos");
+
+    pa2m_afirmar((hash_quitar(hash, "dsa") == EXITO), "Puedo eliminar el elemento sobreescrito");
+    pa2m_afirmar((hash_quitar(hash, "hrtyr") == EXITO), "Puedo eliminar el elemento sobreescrito");
+
+    hash_destruir(hash);
+}
+
 void dadoUnHashConUnElemento_puedoQuitarlo_yEsteQuedaVacio(){
     hash_t* hash = hash_crear(NULL, 3);
     int elemento = 5;
@@ -326,6 +364,7 @@ int main(){
     dadoUnHashVacio_puedoInsertarVariosElementos_yLiberarlosCorrectamente();
     dadoUnHashVacio_puedoInsertarMuchosElementos();
     dadoUnHashConUnElemento_puedoSobreescribirlo();
+    dadoUnHashConVariosElemento_puedoSobreescribirAlgunos();
 
     pa2m_nuevo_grupo("Pruebas de quitado");
     dadoUnHashConUnElemento_puedoQuitarlo_yEsteQuedaVacio();
